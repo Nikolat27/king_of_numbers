@@ -3,9 +3,9 @@ package database
 import (
 	"context"
 	"errors"
-	"os"
 	"time"
 
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -30,7 +30,7 @@ func New(uri string) (*mongo.Database, error) {
 }
 
 func getDatabaseName() (string, error) {
-	dbName := os.Getenv("DATABASE_NAME")
+	dbName := viper.GetString("DATABASE_NAME")
 	if dbName == "" {
 		return "", errors.New("DATABASE_NAME env variable does not exist")
 	}

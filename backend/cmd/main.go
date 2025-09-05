@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
 
 	webserver "github.com/Nikolat27/king_of_numbers/backend/WebServer"
 	"github.com/Nikolat27/king_of_numbers/backend/database"
@@ -20,8 +19,6 @@ func main() {
 		panic(fmt.Errorf("reading .env file: %s", err.Error()))
 	}
 
-	fmt.Println(viper.GetString("PORT"))
-
 	mongoURI, err := getMongoURI()
 	if err != nil {
 		panic(fmt.Errorf("getting mongoURI %s", err.Error()))
@@ -32,16 +29,16 @@ func main() {
 		panic(fmt.Errorf("creating new database: %s ", err.Error()))
 	}
 
-	models := models.New(db)
+	newModels := models.New(db)
 
 	pasetoInstance, err := paseto.New()
 	if err != nil {
 		panic(fmt.Errorf("creating paseto: %s ", err.Error()))
 	}
 
-	handlerInstance := handlers.New(models, pasetoInstance)
+	handlerInstance := handlers.New(newModels, pasetoInstance)
 
-	webServerInstance := webserver.New("8000", handlerInstance)
+	webServerInstance := webserver.New(viper.GetString("PORT"), handlerInstance)
 	defer webServerInstance.Close()
 
 	if err := webServerInstance.Run(); err != nil {
@@ -50,7 +47,7 @@ func main() {
 }
 
 func getMongoURI() (string, error) {
-	uri := os.Getenv("MONGO_URI")
+	uri := viper.GetString("MONGO_URI")
 	if uri == "" {
 		return "", errors.New("MONGO_URI env variable does not exist")
 	}

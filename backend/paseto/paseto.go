@@ -3,10 +3,10 @@ package paseto
 import (
 	"crypto/sha256"
 	"errors"
-	"os"
 	"time"
 
 	"github.com/o1egl/paseto"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -30,7 +30,7 @@ func New() (*Maker, error) {
 }
 
 func getSymmetricKey() ([32]byte, error) {
-	symmetricKey := os.Getenv("PASETO_SYMMETRIC_KEY")
+	symmetricKey := viper.GetString("PASETO_SYMMETRIC_KEY")
 	if symmetricKey == "" {
 		return [32]byte{}, errors.New("PASETO_SYMMETRIC_KEY env variable does not exist")
 	}

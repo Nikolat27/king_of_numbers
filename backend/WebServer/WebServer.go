@@ -36,7 +36,7 @@ func (srv *WebServer) setupServer(router *Router) {
 
 // Run -> Http
 func (srv *WebServer) Run() error {
-	log.Println("backend started successfully")
+	log.Println("backend started successfully. Port: ", srv.Port)
 	return srv.Server.ListenAndServe()
 }
 
