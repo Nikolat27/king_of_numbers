@@ -6,7 +6,9 @@
         <div class="flex justify-between items-center h-16">
           <!-- Logo/Title -->
           <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-gold">♔ King of Numbers</h1>
+            <NuxtLink to="/" class="inline-block">
+              <h1 class="text-2xl font-bold text-gold cursor-pointer hover:text-yellow-400 transition-colors duration-300">♔ King of Numbers</h1>
+            </NuxtLink>
           </div>
 
           <!-- Navigation & Theme Toggle -->

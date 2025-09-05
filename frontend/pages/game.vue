@@ -31,13 +31,13 @@
       <!-- Game Status -->
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
         <!-- Round -->
-        <div class="card text-center p-3 md:p-6">
+        <div class="card text-center p-3 md:p-6 select-none cursor-default">
           <h3 class="text-xs md:text-sm font-medium text-text-secondary mb-1 md:mb-2">Round</h3>
           <div class="text-2xl md:text-3xl font-bold text-gold">{{ gameState.currentRound }}</div>
         </div>
 
         <!-- Score -->
-        <div class="card text-center p-3 md:p-6">
+        <div class="card text-center p-3 md:p-6 select-none cursor-default">
           <h3 class="text-xs md:text-sm font-medium text-text-secondary mb-1 md:mb-2">Score</h3>
           <div class="text-2xl md:text-3xl font-bold" :class="gameState.score < 0 ? 'text-alert-red' : 'text-accent-cyan'">
             {{ gameState.score }}
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Mobile-only eliminated players -->
-        <div class="card text-center p-3 md:hidden">
+        <div class="card text-center p-3 md:hidden select-none cursor-default">
           <h3 class="text-xs font-medium text-text-secondary mb-1">Eliminated</h3>
           <div class="text-xl font-bold text-alert-red">{{ gameState.eliminatedPlayers }}</div>
         </div>
@@ -112,20 +112,42 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6 px-2">
             <div class="card p-3 md:p-6">
-              <h4 class="font-bold text-gold mb-2 text-sm md:text-base">📊 Calculations</h4>
-              <p class="text-text-secondary text-xs md:text-sm">Average: {{ gameState.average.toFixed(2) }}</p>
-              <p class="text-text-secondary text-xs md:text-sm">Target (×0.8): {{ gameState.target.toFixed(2) }}</p>
-              <p class="text-text-secondary text-xs md:text-sm">Your choice: {{ gameState.playerChoice }}</p>
-              <p class="text-text-secondary text-xs md:text-sm">Distance: {{ gameState.distance.toFixed(2) }}</p>
+              <h4 class="font-bold text-gold mb-3 text-sm md:text-base">📊 Mathematical Analysis</h4>
+              <div class="space-y-2">
+                <div class="bg-bg-secondary-light dark:bg-bg-secondary-dark p-2 rounded">
+                  <p class="text-text-secondary text-xs md:text-sm font-medium">All Numbers: {{ allPlayerChoices.join(', ') }}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs md:text-sm">
+                  <div class="text-text-secondary">Sum: <span class="font-bold text-gold">{{ sumOfChoices }}</span></div>
+                  <div class="text-text-secondary">Count: <span class="font-bold text-gold">5</span></div>
+                  <div class="text-text-secondary">Average: <span class="font-bold text-accent-cyan">{{ gameState.average.toFixed(2) }}</span></div>
+                  <div class="text-text-secondary">Target: <span class="font-bold text-accent-cyan">{{ gameState.target.toFixed(2) }}</span></div>
+                </div>
+                <div class="border-t border-light-gray dark:border-gray-600 pt-2 mt-2">
+                  <p class="text-text-secondary text-xs md:text-sm">Your Choice: <span class="font-bold text-gold">{{ gameState.playerChoice }}</span></p>
+                  <p class="text-text-secondary text-xs md:text-sm">Your Distance: <span class="font-bold" :class="gameState.distance < 1 ? 'text-green-600' : 'text-alert-red'">{{ gameState.distance.toFixed(2) }}</span></p>
+                  <p class="text-text-secondary text-xs md:text-sm">Winner's Choice: <span class="font-bold text-accent-cyan">{{ winnerChoice }}</span></p>
+                  <p class="text-text-secondary text-xs md:text-sm">Winner's Distance: <span class="font-bold text-green-600">{{ winnerDistance.toFixed(2) }}</span></p>
+                </div>
+              </div>
             </div>
 
             <div class="card p-3 md:p-6">
-              <h4 class="font-bold text-gold mb-2 text-sm md:text-base">🏆 Round Winner</h4>
-              <div class="text-3xl md:text-4xl mb-2">{{ gameState.isWinner ? '🎉' : '💔' }}</div>
-              <p class="text-base md:text-lg font-bold" :class="gameState.isWinner ? 'text-green-600' : 'text-alert-red'">
-                {{ gameState.isWinner ? 'You Won!' : 'You Lost' }}
-              </p>
-              <p class="text-text-secondary text-xs md:text-sm">{{ gameState.roundResult }}</p>
+              <h4 class="font-bold text-gold mb-3 text-sm md:text-base">🏆 Round Results</h4>
+              <div class="text-center">
+                <div class="text-3xl md:text-4xl mb-3">{{ gameState.isWinner ? '🎉' : '💔' }}</div>
+                <p class="text-base md:text-lg font-bold mb-2" :class="gameState.isWinner ? 'text-green-600' : 'text-alert-red'">
+                  {{ gameState.isWinner ? 'Victory!' : 'Defeat!' }}
+                </p>
+                <div class="bg-bg-secondary-light dark:bg-bg-secondary-dark p-3 rounded mb-3">
+                  <p class="text-text-secondary text-xs md:text-sm mb-1">{{ gameState.roundResult }}</p>
+                  <p class="text-text-secondary text-xs md:text-sm">Score Change: <span :class="gameState.scoreChange < 0 ? 'text-alert-red' : 'text-accent-cyan'">{{ gameState.scoreChange }}</span></p>
+                </div>
+                <div class="text-xs md:text-sm text-text-secondary">
+                  <p>Round {{ gameState.currentRound }} Complete</p>
+                  <p>Ready for next challenge?</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -176,7 +198,9 @@ const gameState = reactive({
   distance: 0,
   isWinner: false,
   roundResult: '',
-  gameOverMessage: ''
+  gameOverMessage: '',
+  allChoices: [], // Store all player choices for this round
+  scoreChange: 0 // Score change for current round
 })
 
 // Player profiles
@@ -189,6 +213,24 @@ const players = reactive([
 ])
 
 const selectedNumber = ref(null)
+
+// Computed properties for round results
+const allPlayerChoices = computed(() => gameState.allChoices)
+const sumOfChoices = computed(() => gameState.allChoices.reduce((sum, num) => sum + num, 0))
+const winnerChoice = computed(() => {
+  if (gameState.allChoices.length === 0) return '?'
+  const target = gameState.target
+  const distances = gameState.allChoices.map(num => Math.abs(num - target))
+  const minDistance = Math.min(...distances)
+  const winnerIndex = distances.indexOf(minDistance)
+  return gameState.allChoices[winnerIndex]
+})
+const winnerDistance = computed(() => {
+  if (gameState.allChoices.length === 0) return 0
+  const target = gameState.target
+  const distances = gameState.allChoices.map(num => Math.abs(num - target))
+  return Math.min(...distances)
+})
 
 // Select a number from the grid
 const selectNumber = (number) => {
@@ -279,6 +321,10 @@ const submitNumber = () => {
     const otherChoices = generateOtherPlayersChoices()
     const result = calculateRound(choice, otherChoices)
 
+    // Store all choices for display
+    gameState.allChoices = [choice, ...otherChoices]
+    gameState.scoreChange = result.scoreChange
+
     gameState.average = result.average
     gameState.target = result.target
     gameState.distance = result.distances
@@ -294,7 +340,7 @@ const submitNumber = () => {
         players[i].score -= 1
 
         // Apply exact match rule to AI players too
-        if (gameState.eliminatedPlayers >= 2 && Math.abs(winnerChoice - result.target) < 0.01) {
+        if (gameState.eliminatedPlayers >= 2 && Math.abs(result.winnerChoice - result.target) < 0.01) {
           players[i].score -= 1 // Additional -1 for exact match
         }
       }
@@ -335,6 +381,8 @@ const resetGame = () => {
   gameState.eliminatedPlayers = 0
   gameState.gamePhase = 'input'
   gameState.playerChoice = null
+  gameState.allChoices = []
+  gameState.scoreChange = 0
   selectedNumber.value = null
 
   // Reset all player scores
