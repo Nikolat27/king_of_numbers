@@ -17,27 +17,27 @@ export default {
       colors: {
         // Primary Colors
         'deep-navy': '#1E2A38',
-        'gold': '#F5C518',
+        'gold': '#D4AF37',
         // Accent Colors
-        'accent-cyan': '#4FD1C5',
+        'accent-cyan': '#0891B2',
         'soft-white': '#F8FAFC',
-        'light-gray': '#E2E8F0',
+        'light-gray': '#CBD5E0',
         'alert-red': '#F56565',
         // Additional semantic colors for dark/light mode
         'bg-primary': {
-          light: '#F8FAFC',
+          light: '#FFFFFF',
           dark: '#1E2A38'
         },
         'bg-secondary': {
-          light: '#E2E8F0',
+          light: '#F8FAFC',
           dark: '#2D3748'
         },
         'text-primary': {
-          light: '#1E2A38',
+          light: '#1A202C',
           dark: '#F8FAFC'
         },
         'text-secondary': {
-          light: '#4A5568',
+          light: '#2D3748',
           dark: '#E2E8F0'
         }
       },
