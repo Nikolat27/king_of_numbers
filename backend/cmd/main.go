@@ -11,13 +11,16 @@ import (
 	"github.com/Nikolat27/king_of_numbers/backend/database/models"
 	"github.com/Nikolat27/king_of_numbers/backend/handlers"
 	"github.com/Nikolat27/king_of_numbers/backend/paseto"
-	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		panic(fmt.Errorf("loading .env file: %s", err.Error()))
+	viper.SetConfigFile(".env")
+	if err := viper.ReadInConfig(); err != nil {
+		panic(fmt.Errorf("reading .env file: %s", err.Error()))
 	}
+
+	fmt.Println(viper.GetString("PORT"))
 
 	mongoURI, err := getMongoURI()
 	if err != nil {
