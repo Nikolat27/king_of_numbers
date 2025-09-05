@@ -19,6 +19,7 @@ func newRouter(handler *handlers.Handler) *Router {
 	// All APIs should be used via 'api' prefix
 	routerInstance.Route("/api", func(r chi.Router) {
 		getHealthRoute(r, handler)
+		getUsersRoutes(r, handler)
 	})
 
 	return &Router{CoreRouter: routerInstance}
@@ -26,4 +27,8 @@ func newRouter(handler *handlers.Handler) *Router {
 
 func getHealthRoute(r chi.Router, handler *handlers.Handler) {
 	r.Get("/health", handler.HealthCheck)
+}
+
+func getUsersRoutes(r chi.Router, handler *handlers.Handler) {
+	r.Post("/users/register", handler.RegisterUser)
 }

@@ -33,3 +33,15 @@ func ParseJSON(w http.ResponseWriter, requestBody io.ReadCloser, maxBytes int64,
 	}
 }
 
+func WriteErrorJSON(w http.ResponseWriter, statusCode int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+
+	response := map[string]string{
+		"error": message,
+	}
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
