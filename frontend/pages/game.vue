@@ -53,24 +53,39 @@
         <!-- Input Phase -->
         <div v-if="gameState.gamePhase === 'input'" class="text-center">
           <h3 class="text-2xl font-bold text-text-primary mb-6">Choose Your Number (0-100)</h3>
-          <form @submit.prevent="submitNumber" class="max-w-md mx-auto space-y-4">
-            <input
-              v-model="playerNumber"
-              type="number"
-              placeholder="Enter 0-100"
-              class="input-field w-full text-center text-2xl"
-              min="0"
-              max="100"
-              required
-            />
+          <p class="text-text-secondary mb-4">Click on any number to select it</p>
+
+          <!-- Number Grid -->
+          <div class="max-w-2xl mx-auto">
+            <div class="grid grid-cols-10 gap-1 mb-6">
+              <button
+                v-for="number in 101"
+                :key="number - 1"
+                @click="selectNumber(number - 1)"
+                class="aspect-square text-sm font-bold rounded-lg border-2 transition-all duration-200
+                       hover:scale-110 hover:shadow-lg"
+                :class="selectedNumber === (number - 1)
+                  ? 'bg-gold text-deep-navy border-gold shadow-lg scale-110'
+                  : 'bg-bg-secondary-light dark:bg-bg-secondary-dark text-text-primary border-light-gray dark:border-gray-600 hover:border-gold'"
+              >
+                {{ number - 1 }}
+              </button>
+            </div>
+
+            <!-- Selected Number Display -->
+            <div v-if="selectedNumber !== null" class="mb-6">
+              <p class="text-lg text-text-secondary">Selected: <span class="font-bold text-gold text-xl">{{ selectedNumber }}</span></p>
+            </div>
+
+            <!-- Submit Button -->
             <button
-              type="submit"
-              class="btn-primary w-full"
-              :disabled="!playerNumber && playerNumber !== 0"
+              @click="submitNumber"
+              class="btn-primary"
+              :disabled="selectedNumber === null"
             >
-              Submit Number
+              Confirm Selection
             </button>
-          </form>
+          </div>
         </div>
 
         <!-- Waiting Phase -->
@@ -157,7 +172,12 @@ const gameState = reactive({
   gameOverMessage: ''
 })
 
-const playerNumber = ref('')
+const selectedNumber = ref(null)
+
+// Select a number from the grid
+const selectNumber = (number) => {
+  selectedNumber.value = number
+}
 
 // Simulate other players' choices
 const generateOtherPlayersChoices = () => {
@@ -234,11 +254,9 @@ const calculateRound = (playerChoice, otherChoices) => {
 }
 
 const submitNumber = () => {
-  if (playerNumber.value === '' || playerNumber.value === null) return
+  if (selectedNumber.value === null) return
 
-  const choice = parseInt(playerNumber.value)
-  if (choice < 0 || choice > 100) return
-
+  const choice = selectedNumber.value
   gameState.playerChoice = choice
   gameState.gamePhase = 'waiting'
 
@@ -276,7 +294,7 @@ const submitNumber = () => {
     gameState.gamePhase = 'results'
   }, 2000)
 
-  playerNumber.value = ''
+  selectedNumber.value = null
 }
 
 const nextRound = () => {
@@ -292,6 +310,6 @@ const resetGame = () => {
   gameState.eliminatedPlayers = 0
   gameState.gamePhase = 'input'
   gameState.playerChoice = null
-  playerNumber.value = ''
+  selectedNumber.value = null
 }
 </script>

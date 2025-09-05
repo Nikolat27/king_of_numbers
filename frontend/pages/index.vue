@@ -154,7 +154,7 @@
     <footer class="py-8 px-4 sm:px-6 lg:px-8 border-t border-light-gray dark:border-gray-600">
       <div class="max-w-4xl mx-auto text-center">
         <p class="text-text-secondary">
-          Inspired by <strong>Alice in Borderland</strong> • Built with Vue.js & Nuxt
+          Inspired by <strong>Alice in Borderland</strong>
         </p>
       </div>
     </footer>
