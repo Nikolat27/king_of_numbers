@@ -37,7 +37,7 @@
 @layer components {
   /* Game-specific components */
   .btn-primary {
-    @apply bg-gold hover:bg-yellow-500 text-deep-navy font-semibold py-3 px-6 rounded-lg
+    @apply bg-gold hover:bg-yellow-500 text-white font-semibold py-3 px-6 rounded-lg
            transition-all duration-200 transform hover:scale-105 active:scale-95
            shadow-lg hover:shadow-xl;
   }

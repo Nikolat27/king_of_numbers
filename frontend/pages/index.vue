@@ -20,7 +20,7 @@
         <div class="mb-16">
           <NuxtLink
             to="/game"
-            class="inline-block bg-gold hover:bg-yellow-500 text-deep-navy font-bold text-xl px-12 py-4 rounded-xl
+            class="inline-block bg-gold hover:bg-yellow-500 text-white font-bold text-xl px-12 py-4 rounded-xl
                      transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-gold/50
                      border-4 border-gold hover:border-yellow-500"
           >

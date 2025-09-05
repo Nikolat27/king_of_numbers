@@ -3,53 +3,25 @@
     <div class="max-w-4xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
       <!-- Game Header -->
       <div class="text-center mb-6 md:mb-8 px-4">
-        <h1 class="text-3xl md:text-6xl font-bold text-gold mb-3 md:mb-4 drop-shadow-lg">
-          ♔ King of Numbers ♔
-        </h1>
+        <NuxtLink to="/" class="inline-block">
+          <h1 class="text-3xl md:text-6xl font-bold text-gold mb-3 md:mb-4 drop-shadow-lg cursor-pointer hover:text-yellow-400 transition-colors duration-300">
+            ♔ King of Numbers ♔
+          </h1>
+        </NuxtLink>
         <p class="text-base md:text-lg text-text-secondary dark:text-soft-white max-w-2xl mx-auto leading-relaxed">
           Choose your number wisely. Survival depends on your mathematical strategy!
         </p>
       </div>
 
-      <!-- Player Profiles -->
-      <div class="grid grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-8">
-        <div v-for="(player, index) in players" :key="index"
-          class="card text-center transform hover:scale-105 transition-transform duration-300 p-2 md:p-4 select-none cursor-default"
-          :class="index === 0 ? 'ring-2 ring-gold' : ''">
-          <div
-            class="w-12 h-12 md:w-16 md:h-16 mx-auto mb-2 md:mb-3 rounded-full bg-gradient-to-br from-gold to-yellow-600 flex items-center justify-center text-lg md:text-2xl font-bold text-deep-navy">
-            {{ player.avatar }}
-          </div>
-          <h4 class="font-bold text-text-primary text-xs md:text-sm mb-1 truncate">{{ player.name }}</h4>
-          <div class="text-sm md:text-base text-text-secondary font-semibold">
-            <span :class="player.score < 0 ? 'text-alert-red' : 'text-accent-cyan'">{{ player.score }}</span>
-          </div>
-          <div v-if="index === 0" class="text-xs text-gold font-medium mt-1">YOU</div>
-        </div>
-      </div>
+      <!-- Player Profiles Component -->
+      <PlayerProfiles :players="players" />
 
-      <!-- Game Status -->
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
-        <!-- Round -->
-        <div class="card text-center p-3 md:p-6 select-none cursor-default">
-          <h3 class="text-xs md:text-sm font-medium text-text-secondary mb-1 md:mb-2">Round</h3>
-          <div class="text-2xl md:text-3xl font-bold text-gold">{{ gameState.currentRound }}</div>
-        </div>
-
-        <!-- Score -->
-        <div class="card text-center p-3 md:p-6 select-none cursor-default">
-          <h3 class="text-xs md:text-sm font-medium text-text-secondary mb-1 md:mb-2">Score</h3>
-          <div class="text-2xl md:text-3xl font-bold" :class="gameState.score < 0 ? 'text-alert-red' : 'text-accent-cyan'">
-            {{ gameState.score }}
-          </div>
-        </div>
-
-        <!-- Mobile-only eliminated players -->
-        <div class="card text-center p-3 md:hidden select-none cursor-default">
-          <h3 class="text-xs font-medium text-text-secondary mb-1">Eliminated</h3>
-          <div class="text-xl font-bold text-alert-red">{{ gameState.eliminatedPlayers }}</div>
-        </div>
-      </div>
+      <!-- Game Status Component -->
+      <GameStatus
+        :current-round="gameState.currentRound"
+        :score="gameState.score"
+        :eliminated-players="gameState.eliminatedPlayers"
+      />
 
       <!-- Game Area -->
       <div class="card mb-8">
@@ -73,30 +45,12 @@
           <h3 class="text-xl md:text-2xl font-bold text-text-primary mb-4 md:mb-6 px-2">Choose Your Number (0-100)</h3>
           <p class="text-sm md:text-base text-text-secondary mb-4 px-2">Click on any number to select it</p>
 
-          <!-- Number Grid -->
-          <div class="max-w-2xl mx-auto px-2">
-            <div class="grid grid-cols-10 gap-1 md:gap-1 mb-4 md:mb-6">
-              <button v-for="number in 101" :key="number - 1" @click="selectNumber(number - 1)" class="aspect-square text-xs md:text-sm font-bold rounded-md md:rounded-lg border-2 transition-all duration-200
-                       min-h-[32px] md:min-h-[40px] touch-manipulation
-                       hover:scale-110 hover:shadow-lg active:scale-95"
-                :class="selectedNumber === (number - 1)
-                  ? 'bg-gold text-deep-navy border-gold shadow-lg scale-110'
-                  : 'bg-bg-secondary-light dark:bg-bg-secondary-dark text-text-primary border-light-gray dark:border-gray-600 hover:border-gold'">
-                {{ number - 1 }}
-              </button>
-            </div>
-
-            <!-- Selected Number Display -->
-            <div v-if="selectedNumber !== null" class="mb-4 md:mb-6">
-              <p class="text-base md:text-lg text-text-secondary">Selected: <span class="font-bold text-gold text-lg md:text-xl">{{
-                selectedNumber }}</span></p>
-            </div>
-
-            <!-- Submit Button -->
-            <button @click="submitNumber" class="btn-primary w-full md:w-auto text-base md:text-lg py-3 md:py-2 px-6 md:px-4 min-h-[48px] md:min-h-[40px] touch-manipulation" :disabled="selectedNumber === null">
-              Confirm Selection
-            </button>
-          </div>
+          <!-- Number Grid Component -->
+          <NumberGrid
+            :selected-number="selectedNumber"
+            @number-selected="selectNumber"
+            @submit-number="submitNumber"
+          />
         </div>
 
         <!-- Waiting Phase -->
@@ -104,6 +58,117 @@
           <div class="text-5xl md:text-6xl mb-4">⏳</div>
           <h3 class="text-xl md:text-2xl font-bold text-text-primary mb-4">Waiting for Other Players</h3>
           <p class="text-sm md:text-base text-text-secondary">All 5 players must submit their numbers...</p>
+        </div>
+
+        <!-- Results Modal -->
+        <div v-if="showResultsModal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300" :class="modalStep < 5 ? 'cursor-none' : ''" @click.self="$event.stopPropagation()">
+          <div class="bg-bg-primary dark:bg-deep-navy rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-light-gray dark:border-gray-600" ref="modalContent">
+            <div class="p-6 md:p-8">
+              <div class="text-center mb-6">
+                <h3 class="text-2xl md:text-3xl font-bold text-gold mb-2">🎭 Round {{ gameState.currentRound }} Results</h3>
+                <div class="w-16 h-1 bg-gold mx-auto rounded-full"></div>
+              </div>
+
+              <!-- Step 1: Reveal Player Choices -->
+              <div v-if="modalStep >= 1" class="mb-6">
+                <h4 class="text-lg md:text-xl font-bold text-white mb-4 flex items-center">
+                  <span class="text-2xl mr-2">👥</span> Player Choices Revealed
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+                  <div
+                    v-for="(choice, index) in revealedChoices"
+                    :key="index"
+                    class="card text-center p-3 transition-all duration-500"
+                    :class="index === 0 ? 'ring-2 ring-gold' : ''"
+                  >
+                    <div class="text-2xl mb-2">{{ players[index].avatar }}</div>
+                    <div class="font-bold text-text-primary text-sm">{{ players[index].name }}</div>
+                    <div class="text-xl md:text-2xl font-bold text-gold mt-1">{{ choice }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Combine Numbers -->
+              <div v-if="modalStep >= 2" class="mb-6">
+                <h4 class="text-lg md:text-xl font-bold text-white mb-4 flex items-center">
+                  <span class="text-2xl mr-2">🔢</span> All Numbers Combined
+                </h4>
+                <div class="bg-bg-secondary-light dark:bg-bg-secondary-dark p-4 rounded-lg">
+                  <p class="text-text-secondary text-center text-lg">
+                    <span class="font-bold text-gold">{{ gameState.allChoices.join(' + ') }}</span>
+                    <span class="mx-2">=</span>
+                    <span class="font-bold text-accent-cyan text-xl">{{ sumOfChoices }}</span>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Step 3: Calculate Average -->
+              <div v-if="modalStep >= 3" class="mb-6">
+                <h4 class="text-lg md:text-xl font-bold text-white mb-4 flex items-center">
+                  <span class="text-2xl mr-2">📊</span> Calculate Average
+                </h4>
+                <div class="bg-bg-secondary-light dark:bg-bg-secondary-dark p-4 rounded-lg">
+                  <div class="text-center">
+                    <p class="text-text-secondary text-lg mb-2">
+                      <span class="font-bold text-gold">{{ sumOfChoices }}</span>
+                      <span class="mx-2">÷</span>
+                      <span class="font-bold text-gold">5</span>
+                      <span class="mx-2">=</span>
+                      <span class="font-bold text-accent-cyan text-xl">{{ gameState.average.toFixed(2) }}</span>
+                    </p>
+                    <p class="text-sm text-text-secondary">Average of all 5 numbers</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 4: Apply Formula -->
+              <div v-if="modalStep >= 4" class="mb-6">
+                <h4 class="text-lg md:text-xl font-bold text-white mb-4 flex items-center">
+                  <span class="text-2xl mr-2">🎯</span> Apply Target Formula
+                </h4>
+                <div class="bg-bg-secondary-light dark:bg-bg-secondary-dark p-4 rounded-lg">
+                  <div class="text-center">
+                    <p class="text-text-secondary text-lg mb-2">
+                      <span class="font-bold text-accent-cyan">{{ gameState.average.toFixed(2) }}</span>
+                      <span class="mx-2">×</span>
+                      <span class="font-bold text-gold">0.8</span>
+                      <span class="mx-2">=</span>
+                      <span class="font-bold text-green-600 text-xl">{{ gameState.target.toFixed(2) }}</span>
+                    </p>
+                    <p class="text-sm text-text-secondary">Target = Average × 0.8</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 5: Reveal Winner -->
+              <div v-if="modalStep >= 5" class="mb-6">
+                <h4 class="text-lg md:text-xl font-bold text-white mb-4 flex items-center">
+                  <span class="text-2xl mr-2">🏆</span> Winner Revealed
+                </h4>
+                <div class="text-center">
+                  <div class="text-4xl md:text-5xl mb-4">{{ gameState.isWinner ? '🎉' : '💔' }}</div>
+                  <p class="text-xl md:text-2xl font-bold mb-2" :class="gameState.isWinner ? 'text-green-600' : 'text-alert-red'">
+                    {{ gameState.isWinner ? 'You Won!' : 'You Lost!' }}
+                  </p>
+                  <div class="bg-bg-secondary-light dark:bg-bg-secondary-dark p-4 rounded-lg">
+                    <p class="text-text-secondary mb-2">Target: <span class="font-bold text-green-600">{{ gameState.target.toFixed(2) }}</span></p>
+                    <p class="text-text-secondary mb-2">Winner's Choice: <span class="font-bold text-accent-cyan">{{ winnerChoice }}</span></p>
+                    <p class="text-text-secondary">Winner's Distance: <span class="font-bold text-green-600">{{ winnerDistance.toFixed(2) }}</span></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Continue Button -->
+              <div v-if="modalStep >= 5" class="text-center">
+                <button
+                  @click="closeResultsModal"
+                  class="btn-primary min-h-[48px] touch-manipulation text-base md:text-lg py-3 px-6"
+                >
+                  Continue to Next Round
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Results Phase -->
@@ -156,8 +221,25 @@
           </button>
         </div>
 
+        <!-- Results Modal Component -->
+        <ResultsModal
+          :show-modal="showResultsModal"
+          :modal-step="modalStep"
+          :current-round="gameState.currentRound"
+          :players="players"
+          :all-choices="allPlayerChoices"
+          :revealed-choices="revealedChoices"
+          :sum-of-choices="sumOfChoices"
+          :average="gameState.average"
+          :target="gameState.target"
+          :winner-choice="winnerChoice"
+          :winner-distance="winnerDistance"
+          :is-winner="gameState.isWinner"
+          @continue="closeResultsModal"
+        />
+
         <!-- Game Over -->
-        <div v-else-if="gameState.gamePhase === 'gameOver'" class="text-center px-4">
+        <div v-if="gameState.gamePhase === 'gameOver'" class="text-center px-4">
           <div class="text-5xl md:text-6xl mb-4">{{ gameState.score >= 0 ? '🏆' : '💀' }}</div>
           <h3 class="text-2xl md:text-3xl font-bold mb-4" :class="gameState.score >= 0 ? 'text-green-600' : 'text-alert-red'">
             {{ gameState.score >= 0 ? 'GAME CLEAR!' : 'GAME OVER' }}
@@ -186,208 +268,24 @@
 </template>
 
 <script setup>
-// Game state management
-const gameState = reactive({
-  currentRound: 1,
-  score: 0,
-  eliminatedPlayers: 0,
-  gamePhase: 'input', // input, waiting, results, gameOver
-  playerChoice: null,
-  average: 0,
-  target: 0,
-  distance: 0,
-  isWinner: false,
-  roundResult: '',
-  gameOverMessage: '',
-  allChoices: [], // Store all player choices for this round
-  scoreChange: 0 // Score change for current round
-})
+// Use the game logic composable
+const {
+  gameState,
+  showResultsModal,
+  modalStep,
+  revealedChoices,
+  selectedNumber,
+  players,
+  allPlayerChoices,
+  sumOfChoices,
+  winnerChoice,
+  winnerDistance,
+  selectNumber,
+  submitNumber,
+  nextRound,
+  resetGame,
+  closeResultsModal
+} = useGameLogic()
 
-// Player profiles
-const players = reactive([
-  { name: 'You', avatar: '👤', score: 0 },
-  { name: 'Player 2', avatar: '🤖', score: 0 },
-  { name: 'Player 3', avatar: '🎭', score: 0 },
-  { name: 'Player 4', avatar: '🎪', score: 0 },
-  { name: 'Player 5', avatar: '🎯', score: 0 }
-])
-
-const selectedNumber = ref(null)
-
-// Computed properties for round results
-const allPlayerChoices = computed(() => gameState.allChoices)
-const sumOfChoices = computed(() => gameState.allChoices.reduce((sum, num) => sum + num, 0))
-const winnerChoice = computed(() => {
-  if (gameState.allChoices.length === 0) return '?'
-  const target = gameState.target
-  const distances = gameState.allChoices.map(num => Math.abs(num - target))
-  const minDistance = Math.min(...distances)
-  const winnerIndex = distances.indexOf(minDistance)
-  return gameState.allChoices[winnerIndex]
-})
-const winnerDistance = computed(() => {
-  if (gameState.allChoices.length === 0) return 0
-  const target = gameState.target
-  const distances = gameState.allChoices.map(num => Math.abs(num - target))
-  return Math.min(...distances)
-})
-
-// Select a number from the grid
-const selectNumber = (number) => {
-  selectedNumber.value = number
-}
-
-// Simulate other players' choices
-const generateOtherPlayersChoices = () => {
-  const choices = []
-  for (let i = 0; i < 4; i++) {
-    choices.push(Math.floor(Math.random() * 101)) // 0-100
-  }
-  return choices
-}
-
-// Calculate winner and apply rules
-const calculateRound = (playerChoice, otherChoices) => {
-  const allChoices = [playerChoice, ...otherChoices]
-  const average = allChoices.reduce((sum, num) => sum + num, 0) / allChoices.length
-  const target = average * 0.8
-
-  // Find closest numbers
-  const distances = allChoices.map(num => Math.abs(num - target))
-  const minDistance = Math.min(...distances)
-
-  // Check for duplicates (Rule 1)
-  const duplicates = allChoices.filter((num, index) => allChoices.indexOf(num) !== index)
-  const hasDuplicates = duplicates.length > 0
-
-  // Determine winner
-  let winnerIndex = -1
-  let winnerDistance = Infinity
-
-  allChoices.forEach((choice, index) => {
-    const distance = Math.abs(choice - target)
-
-    // Rule 1: Duplicates are invalid
-    if (hasDuplicates && duplicates.includes(choice)) {
-      return // Skip this choice
-    }
-
-    if (distance < winnerDistance) {
-      winnerDistance = distance
-      winnerIndex = index
-    }
-  })
-
-  const isPlayerWinner = winnerIndex === 0
-  const winnerChoice = allChoices[winnerIndex]
-
-  // Apply score changes
-  let scoreChange = 0
-  if (!isPlayerWinner) {
-    scoreChange = -1 // Loser loses 1 point
-
-    // Rule 2: Exact match causes others to lose 2 points each
-    if (gameState.eliminatedPlayers >= 2 && Math.abs(winnerChoice - target) < 0.01) {
-      scoreChange = -2 // Exact match causes double penalty
-    }
-  }
-
-  // Rule 3: Special 0 vs 100 rule
-  if (gameState.eliminatedPlayers >= 3 && playerChoice === 0 && winnerChoice === 100) {
-    scoreChange = 0 // Player doesn't lose if they chose 0 and someone chose 100
-  }
-
-  return {
-    average,
-    target,
-    winnerIndex,
-    isPlayerWinner,
-    scoreChange,
-    distances: distances[0], // Player's distance
-    hasDuplicates,
-    winnerChoice
-  }
-}
-
-const submitNumber = () => {
-  if (selectedNumber.value === null) return
-
-  const choice = selectedNumber.value
-  gameState.playerChoice = choice
-  gameState.gamePhase = 'waiting'
-
-  // Simulate waiting for other players
-  setTimeout(() => {
-    const otherChoices = generateOtherPlayersChoices()
-    const result = calculateRound(choice, otherChoices)
-
-    // Store all choices for display
-    gameState.allChoices = [choice, ...otherChoices]
-    gameState.scoreChange = result.scoreChange
-
-    gameState.average = result.average
-    gameState.target = result.target
-    gameState.distance = result.distances
-    gameState.isWinner = result.isPlayerWinner
-
-    // Update scores
-    gameState.score += result.scoreChange
-    players[0].score = gameState.score // Update player's profile score
-
-    // Update AI player scores (they lose -1 each when player loses)
-    if (!result.isPlayerWinner) {
-      for (let i = 1; i < players.length; i++) {
-        players[i].score -= 1
-
-        // Apply exact match rule to AI players too
-        if (gameState.eliminatedPlayers >= 2 && Math.abs(result.winnerChoice - result.target) < 0.01) {
-          players[i].score -= 1 // Additional -1 for exact match
-        }
-      }
-    }
-
-    // Check for death condition
-    if (gameState.score <= -10) {
-      gameState.gamePhase = 'gameOver'
-      gameState.gameOverMessage = `Final Score: ${gameState.score} | Acid death awaits...`
-      return
-    }
-
-    // Determine round result message
-    if (result.isPlayerWinner) {
-      gameState.roundResult = `You won! Score unchanged`
-    } else {
-      gameState.roundResult = `You lost! (${result.scoreChange} points)`
-      if (result.hasDuplicates && gameState.eliminatedPlayers >= 1) {
-        gameState.roundResult += ' (Duplicate numbers invalidated)'
-      }
-    }
-
-    gameState.gamePhase = 'results'
-  }, 2000)
-
-  selectedNumber.value = null
-}
-
-const nextRound = () => {
-  gameState.currentRound++
-  gameState.gamePhase = 'input'
-  gameState.playerChoice = null
-}
-
-const resetGame = () => {
-  gameState.currentRound = 1
-  gameState.score = 0
-  gameState.eliminatedPlayers = 0
-  gameState.gamePhase = 'input'
-  gameState.playerChoice = null
-  gameState.allChoices = []
-  gameState.scoreChange = 0
-  selectedNumber.value = null
-
-  // Reset all player scores
-  players.forEach(player => {
-    player.score = 0
-  })
-}
+// All game logic is now handled by the useGameLogic composable above
 </script>
