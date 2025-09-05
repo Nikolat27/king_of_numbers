@@ -46,11 +46,13 @@
           <p class="text-sm md:text-base text-text-secondary mb-4 px-2">Click on any number to select it</p>
 
           <!-- Number Grid Component -->
-          <NumberGrid
-            :selected-number="selectedNumber"
-            @number-selected="selectNumber"
-            @submit-number="submitNumber"
-          />
+          <client-only>
+            <NumberGrid
+              :selected-number="selectedNumber"
+              @number-selected="selectNumber"
+              @submit-number="submitNumber"
+            />
+          </client-only>
         </div>
 
         <!-- Waiting Phase -->

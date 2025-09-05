@@ -17,7 +17,7 @@
     </div>
 
     <!-- Selected Number Display -->
-    <div v-if="selectedNumber !== null" class="mb-4 md:mb-6">
+    <div v-if="!isDisabled" class="mb-4 md:mb-6">
       <p class="text-base md:text-lg text-text-secondary">Selected: <span class="font-bold text-gold text-lg md:text-xl">{{
         selectedNumber }}</span></p>
     </div>
@@ -26,7 +26,7 @@
     <button
       @click="$emit('submit-number')"
       class="btn-primary w-full md:w-auto text-base md:text-lg py-3 md:py-2 px-6 md:px-4 min-h-[48px] md:min-h-[40px] touch-manipulation"
-      :disabled="selectedNumber === null"
+      :disabled="isDisabled"
     >
       Confirm Selection
     </button>
@@ -34,11 +34,17 @@
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   selectedNumber: {
     type: Number,
     default: null
   }
+})
+
+const isDisabled = computed(() => {
+  return props.selectedNumber === null || props.selectedNumber === undefined
 })
 
 defineEmits(['number-selected', 'submit-number'])
