@@ -20,8 +20,6 @@ func main() {
 		panic(fmt.Errorf("reading .env file: %s", err.Error()))
 	}
 
-	fmt.Println(viper.GetString("PORT"))
-
 	mongoURI, err := getMongoURI()
 	if err != nil {
 		panic(fmt.Errorf("getting mongoURI %s", err.Error()))
@@ -32,14 +30,14 @@ func main() {
 		panic(fmt.Errorf("creating new database: %s ", err.Error()))
 	}
 
-	models := models.New(db)
+	allModels := models.New(db)
 
-	pasetoInstance, err := paseto.New()
-	if err != nil {
-		panic(fmt.Errorf("creating paseto: %s ", err.Error()))
+	pasetoInstance, errResp := paseto.New()
+	if errResp != nil {
+		panic(fmt.Errorf("creating paseto: %s ", errResp.Detail))
 	}
 
-	handlerInstance := handlers.New(models, pasetoInstance)
+	handlerInstance := handlers.New(allModels, pasetoInstance)
 
 	webServerInstance := webserver.New("8000", handlerInstance)
 	defer webServerInstance.Close()
