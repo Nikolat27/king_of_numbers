@@ -7,5 +7,5 @@ import (
 )
 
 func (handler *Handler) HealthCheck(w http.ResponseWriter, r *http.Request) {
-	utils.WriteJSON(w, 200, "Backend is working!")
+	utils.WriteJSON(w, http.StatusOK, "Backend is working!")
 }
