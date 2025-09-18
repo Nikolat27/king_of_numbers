@@ -31,4 +31,5 @@ func getHealthRoute(r chi.Router, handler *handlers.Handler) {
 
 func getUsersRoutes(r chi.Router, handler *handlers.Handler) {
 	r.Post("/users/register", handler.RegisterUser)
+	r.Post("/users/login", handler.LoginUser)
 }
