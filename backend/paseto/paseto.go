@@ -38,32 +38,34 @@ func getSymmetricKey() ([32]byte, *types.ErrorResponse) {
 
 	hash := sha256.Sum256([]byte(symmetricKey))
 
-	return hash, &types.ErrorResponse{}
+	return hash, nil
 }
 
 func (maker *Maker) CreateToken(userId primitive.ObjectID, username string,
 	duration time.Duration) (string, *types.ErrorResponse) {
 
-	payload, err := NewPayload(userId, username, duration)
-	if err != nil {
-		return "", types.NewErrorResponse("new auth token", err.Error())
+	payload, errResp := NewPayload(userId, username, duration)
+	if errResp != nil {
+		return "", errResp
 	}
+
 	token, err := maker.paseto.Encrypt(maker.symmetricKey[:], payload, nil)
 	if err != nil {
-		types.NewErrorResponse("generate auth token", err.Error())
+		types.NewErrorResponse("generate auth token", err)
 	}
 
 	return token, nil
 }
 
 func (maker *Maker) VerifyToken(token string) (*Payload, *types.ErrorResponse) {
+
 	var payload Payload
 	if err := maker.paseto.Decrypt(token, maker.symmetricKey[:], &payload, nil); err != nil {
 		return nil, types.NewErrorResponse("verify auth token", err.Error())
 	}
 
 	if err := payload.Valid(); err != nil {
-		return nil, types.NewErrorResponse("verify auth token", err.Error())
+		return nil, err
 	}
 
 	return &payload, nil

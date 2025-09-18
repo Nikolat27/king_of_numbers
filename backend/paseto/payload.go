@@ -1,9 +1,9 @@
 package paseto
 
 import (
-	"errors"
 	"time"
 
+	"github.com/Nikolat27/king_of_numbers/backend/types"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -16,10 +16,10 @@ type Payload struct {
 	ExpiryAt  time.Time          `json:"expiry_at"`
 }
 
-func NewPayload(userId primitive.ObjectID, username string, duration time.Duration) (*Payload, error) {
+func NewPayload(userId primitive.ObjectID, username string, duration time.Duration) (*Payload, *types.ErrorResponse) {
 	tokenId, err := uuid.NewRandom()
 	if err != nil {
-		return nil, err
+		return nil, types.NewErrorResponse("random uuid", err)
 	}
 
 	payload := &Payload{
@@ -33,9 +33,9 @@ func NewPayload(userId primitive.ObjectID, username string, duration time.Durati
 	return payload, nil
 }
 
-func (payload *Payload) Valid() error {
+func (payload *Payload) Valid() *types.ErrorResponse {
 	if time.Now().After(payload.ExpiryAt) {
-		return errors.New("token has expired")
+		return types.NewErrorResponse("token validating", "token is expired")
 	}
 
 	return nil
