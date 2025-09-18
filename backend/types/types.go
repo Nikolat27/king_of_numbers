@@ -1,8 +1,8 @@
 package types
 
 type ErrorResponse struct {
-	Type   string
-	Detail string
+	Type   string `json:"type"`
+	Detail string `json:"detail"`
 }
 
 func NewErrorResponse(typ, detail any) *ErrorResponse {
